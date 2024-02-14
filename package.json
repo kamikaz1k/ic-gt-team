@@ -1,11 +1,11 @@
 {
-  "name": "chrome-extension-boilerplate-react-vite",
+  "name": "ic-gt-team",
   "version": "0.0.1",
-  "description": "chrome extension boilerplate",
+  "description": "chrome extension for Growth Tooling team",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite.git"
+    "url": "https://github.com/kamikaz1k/ic-gt-team"
   },
   "scripts": {
     "build": "tsc --noEmit && vite build",
@@ -14,12 +14,12 @@
     "build:firefox:watch": "cross-env __DEV__=true __FIREFOX__=true vite build -w --mode development",
     "build:hmr": "rollup --config utils/reload/rollup.config.mjs",
     "wss": "node utils/reload/initReloadServer.js",
-    "dev": "pnpm build:hmr && (run-p wss build:watch)",
-    "dev:firefox": "pnpm build:hmr && (run-p wss build:firefox:watch)",
+    "dev": "yarn build:hmr && (run-p wss build:watch)",
+    "dev:firefox": "yarn build:hmr && (run-p wss build:firefox:watch)",
     "test": "vitest",
     "commitlint": "commitlint --edit",
     "lint": "eslint src --ext .ts,.js,.tsx,.jsx",
-    "lint:fix": "pnpm lint --fix",
+    "lint:fix": "yarn lint --fix",
     "prettier": "prettier . --write",
     "prepare": "husky install"
   },
@@ -36,7 +36,7 @@
     "@rollup/plugin-sucrase": "^5.0.2",
     "@rollup/plugin-typescript": "11.1.5",
     "@testing-library/react": "14.0.0",
-    "@types/chrome": "0.0.251",
+    "@types/chrome": "^0.0.260",
     "@types/node": "20.8.10",
     "@types/react": "18.2.37",
     "@types/react-dom": "18.2.18",

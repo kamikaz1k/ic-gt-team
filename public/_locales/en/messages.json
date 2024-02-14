@@ -1,10 +1,10 @@
 {
   "extensionDescription": {
-    "description": "Extension description",
-    "message": "Chrome extension boilerplate developed with Vite, React and Typescript"
+    "description": "Team extension for GT team",
+    "message": "Team extension for GT team"
   },
   "extensionName": {
-    "description": "Extension name",
-    "message": "Chrome extension boilerplate"
+    "description": "Growth Tooling team extension",
+    "message": "GT Extension"
   }
 }
