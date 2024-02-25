@@ -1,5 +1,3 @@
-// import { AccountStatus } from 'chrome';
-
 import React, { useEffect } from 'react';
 // import logo from '@assets/img/logo.svg';
 // import '@pages/newtab/Newtab.css';
@@ -10,11 +8,9 @@ import withSuspense from '@src/shared/hoc/withSuspense';
 import withErrorBoundary from '@src/shared/hoc/withErrorBoundary';
 
 // TODO: figure out type for this
-// eslint-disable-next-line react/prop-types
-const Column = ({ children }) => (
+const Column = ({ children }: { children?: React.ReactNode }) => (
   <div
     style={{
-      // border: '1px solid red',
       display: 'flex',
       flexDirection: 'column',
       flexBasis: '100%',
@@ -23,6 +19,47 @@ const Column = ({ children }) => (
     {children}
   </div>
 );
+
+const FallbackFavicon = ({ url, size = 16 }: { url: string; size?: number }) => {
+  const urlObj = new URL(url);
+  const fallback = `https://www.google.com/s2/favicons?sz=${size}&domain=${urlObj.origin}`;
+  return (
+    <img
+      height={size}
+      width={size}
+      onError={e => {
+        (e.target as HTMLImageElement).src = fallback;
+      }}
+      src={`${urlObj.origin}/favicon.ico`}
+      alt="favicon"
+    />
+  );
+};
+
+type LinkTileProps = {
+  title: string;
+  url: string;
+};
+
+const LinkTile = ({ title, url }: LinkTileProps) => {
+  const isInstacart = url.includes('instacart') || url.includes('fernet') || url.includes('isc');
+  const urlObj = new URL(url);
+  const src = url.includes('instacart')
+    ? 'https://www.instacart.com/favicon.ico'
+    : 'https://www.google.com/s2/favicons?sz=64&domain=' + urlObj.origin;
+
+  const name = isInstacart || url.includes('google.') ? urlObj.hostname.split('.')[0] : title;
+  return (
+    <a
+      href={url}
+      style={{ display: 'flex', flexDirection: 'column', justifyContent: 'start', width: 76, textAlign: 'center' }}>
+      <figure style={{ width: '100%', height: 76, margin: '0 auto' }}>
+        <img style={{ width: '100%' }} src={src} alt="favicon" />
+      </figure>
+      <div>{name.length > 10 ? name.slice(0, 10) + '...' : name}</div>
+    </a>
+  );
+};
 
 const Newtab = () => {
   const [mostVisited, setMostVisited] = React.useState([]);
@@ -38,54 +75,62 @@ const Newtab = () => {
   const theme = useStorage(exampleThemeStorage);
   const blazerLinks = [
     {
-      name: 'campaign-by-utm_campaign',
-      link: 'https://blazer.instacart.tools/blazer/queries/321805-campaign-by-utm_campaign?utm_campaign=pharmasave_instore_directlink_V3-Q4-2023',
+      title: 'campaign-by-utm_campaign',
+      url: 'https://blazer.instacart.tools/blazer/queries/321805-campaign-by-utm_campaign?utm_campaign=', //pharmasave_instore_directlink_V3-Q4-2023',
     },
     {
-      name: 'taas-segment-by-id',
-      link: 'https://blazer.instacart.tools/blazer/queries/321536-taas-segment-by-id?segment_id=1f4218d4-37a4-4cc9-be33-a2fb4f4e9d82',
+      title: 'taas-segment-by-id',
+      url: 'https://blazer.instacart.tools/blazer/queries/321536-taas-segment-by-id?segment_id=', //1f4218d4-37a4-4cc9-be33-a2fb4f4e9d82',
     },
     {
-      name: 'campaign-by-id',
-      link: 'https://blazer.instacart.tools/blazer/queries/321807-campaign-by-id?campaign_id=12288488746005124',
+      title: 'campaign-by-id',
+      url: 'https://blazer.instacart.tools/blazer/queries/321807-campaign-by-id?campaign_id=', //12288488746005124',
     },
     {
-      name: 'canada-campaigns-that-are-active',
-      link: 'https://blazer.instacart.tools/blazer/queries/323056-canada-campaigns-that-are-active',
+      title: 'canada-campaigns-that-are-active',
+      url: 'https://blazer.instacart.tools/blazer/queries/323056-canada-campaigns-that-are-active',
     },
     {
-      name: 'campaign-discount-policy-check',
-      link: 'https://blazer.instacart.tools/blazer/queries/323093-campaign-discount-policy-check?campaign_id=12961253118009328',
+      title: 'campaign-discount-policy-check',
+      url: 'https://blazer.instacart.tools/blazer/queries/323093-campaign-discount-policy-check?campaign_id=', //12961253118009328',
     },
     {
-      name: 'ipp-find-users-by-email-w-role (defaults to you)',
-      link: `https://blazer.instacart.tools/blazer/queries/316550-ipp-find-users-by-email-w-role?email=${decodeURIComponent(userProfile.email ?? '')}`,
+      title: 'ipp-find-users-by-email-w-role (defaults to you)',
+      url: `https://blazer.instacart.tools/blazer/queries/316550-ipp-find-users-by-email-w-role?email=${decodeURIComponent(userProfile.email ?? '')}`,
     },
   ];
 
   const links = [
     {
-      name: 'V4/CampaignsDomain Github',
-      link: 'https://github.com/instacart/carrot/blob/master/customers/customers-backend/domains/campaigns_domain/',
+      title: 'Campaign Templates IPP/Garden',
+      url: 'https://dashboard.instacart.com/partners/289/warehouses/1000/retailer-funded-marketing/sites/1177/campaign-templates',
     },
     {
-      name: 'V4/CampaignsOrchestrator Github',
-      link: 'https://github.com/instacart/carrot/blob/master/customers/customers-backend/layers/orchestration_layer/orchestrators/retailer_campaign_orchestrators/',
+      title: 'Roulette',
+      url: 'https://roulette.instacart.tools/roulette/production/',
     },
     {
-      name: 'CampaignsDomain Proto Github',
-      link: 'https://github.com/instacart/carrot/blob/master/shared/protos/instacart/customers/campaigns/v1/campaigns_service.proto',
+      title: 'V4/CampaignsDomain Github',
+      url: 'https://github.com/instacart/carrot/blob/master/customers/customers-backend/domains/campaigns_domain/',
     },
     {
-      name: 'CampaignsOrchestrator Proto Github',
-      link: 'https://github.com/instacart/carrot/blob/master/shared/protos/instacart/customers/coupons/v1/retailer_campaign.proto',
+      title: 'V4/CampaignsOrchestrator Github',
+      url: 'https://github.com/instacart/carrot/blob/master/customers/customers-backend/layers/orchestration_layer/orchestrators/retailer_campaign_orchestrators/',
     },
     {
-      name: 'Sprint Retro Board (FigJam)',
-      link: 'https://www.figma.com/file/3WFi9v1BsswNutjM4Wz6jv/GS-Tooling-Retro?type=whiteboard&node-id=126-1512&t=SDORWcovyVF9q1EP-0',
+      title: 'CampaignsDomain Proto Github',
+      url: 'https://github.com/instacart/carrot/blob/master/shared/protos/instacart/customers/campaigns/v1/campaigns_service.proto',
     },
-    { name: 'ICMS Mode Dashboard', link: 'https://app.mode.com/instacart/reports/6fcca1b7f57d' },
-    { name: 'GT Chrome Extension GitHub', link: 'https://github.com/kamikaz1k/ic-gt-team' },
+    {
+      title: 'CampaignsOrchestrator Proto Github',
+      url: 'https://github.com/instacart/carrot/blob/master/shared/protos/instacart/customers/coupons/v1/retailer_campaign.proto',
+    },
+    {
+      title: 'Sprint Retro Board (FigJam)',
+      url: 'https://www.figma.com/file/3WFi9v1BsswNutjM4Wz6jv/GS-Tooling-Retro?type=whiteboard&node-id=126-1512&t=SDORWcovyVF9q1EP-0',
+    },
+    { title: 'ICMS Mode Dashboard', url: 'https://app.mode.com/instacart/reports/6fcca1b7f57d' },
+    { title: 'GT Chrome Extension GitHub', url: 'https://github.com/kamikaz1k/ic-gt-team' },
   ];
 
   const team = [
@@ -114,6 +159,34 @@ const Newtab = () => {
         fontSize: '1.1rem',
       }}>
       <h1>Welcome to GT NewTab</h1>
+
+      <div>
+        <h2>Most Visited (from Chrome)</h2>
+        <ul
+          style={{
+            listStyle: 'none',
+            display: 'flex',
+            flexDirection: 'row',
+            paddingInlineStart: 0,
+            maxWidth: '100%',
+            gap: 18,
+            overflow: 'auto',
+          }}>
+          {mostVisited.map(site => (
+            <li
+              key={site.url}
+              style={{
+                paddingBottom: 20,
+                width: 100,
+                display: 'flex',
+                justifyContent: 'center',
+              }}>
+              <LinkTile {...site} />
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <div
         style={{
           // backgroundColor: theme === 'light' ? '#ffffff' : '#000000',
@@ -130,23 +203,19 @@ const Newtab = () => {
               style={{
                 listStyle: 'square',
               }}>
-              <li>
-                <a href="https://blazer.instacart.tools/blazer/">Blazer</a>
-                <ul>
-                  {blazerLinks.map(link => (
-                    <li key={link.name}>
-                      <a href={link.link}>{link.name}</a>
-                    </li>
-                  ))}
-                </ul>
-              </li>
               {links.map(link => (
-                <li key={link.name}>
-                  <a href={link.link}>{link.name}</a>
+                <li key={link.title}>
+                  <a href={link.url}>
+                    <FallbackFavicon url={link.url} />
+                    <span style={{ paddingLeft: 8 }}>{link.title}</span>
+                  </a>
                 </li>
               ))}
               <li>
-                <a href="https://github.com/orgs/instacart/teams/campaign-tooling">GT PRs on Carrot</a>
+                <a href="https://github.com/orgs/instacart/teams/campaign-tooling">
+                  <FallbackFavicon url={'https://github.com'} />
+                  <span style={{ paddingLeft: 8 }}>GT PRs on Carrot</span>
+                </a>
                 <ul>
                   {teamPrs.map(pr => (
                     <li key={pr.name}>
@@ -160,14 +229,22 @@ const Newtab = () => {
         </Column>
         <Column>
           <div>
-            <h2>Most Visited (from Chrome)</h2>
-            <ul
-              style={{
-                listStyle: 'square',
-              }}>
-              {mostVisited.map(site => (
-                <li key={site.url}>
-                  <a href={site.url}>{site.title}</a>
+            <h2>
+              <a href="https://blazer.instacart.tools/blazer/">Blazer</a>
+            </h2>
+            <ul>
+              {blazerLinks.map(link => (
+                <li key={link.title}>
+                  <a href={link.url}>{link.title}</a>
+                  {link.url.endsWith('=') && (
+                    <input
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          window.location.href = `${link.url} = ${(e.target as HTMLInputElement).value?.trim()}`;
+                        }
+                      }}
+                    />
+                  )}
                 </li>
               ))}
             </ul>
